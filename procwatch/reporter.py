@@ -40,9 +40,23 @@ def print_json(registry: MetricsRegistry, out: TextIO = sys.stdout) -> None:
     out.write(json.dumps(registry.summary(), indent=2) + "\n")
 
 
+def print_csv(registry: MetricsRegistry, out: TextIO = sys.stdout) -> None:
+    """Print metrics as CSV, suitable for piping into other tools."""
+    import csv
+    rows = registry.summary()
+    if not rows:
+        return
+    fieldnames = ["name", "start_count", "restart_count", "last_exit_code", "uptime_seconds"]
+    writer = csv.DictWriter(out, fieldnames=fieldnames, extrasaction="ignore", lineterminator="\n")
+    writer.writeheader()
+    writer.writerows(rows)
+
+
 def report(registry: MetricsRegistry, fmt: str = "table", out: TextIO = sys.stdout) -> None:
     """Dispatch to the right formatter."""
     if fmt == "json":
         print_json(registry, out)
+    elif fmt == "csv":
+        print_csv(registry, out)
     else:
         print_table(registry, out)
