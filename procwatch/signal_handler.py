@@ -47,9 +47,18 @@ class SignalHandler:
             signal.signal(sig, signal.SIG_DFL)
         log.debug("signal handlers restored to defaults")
 
-    def wait_for_shutdown(self) -> None:
-        """Block the calling thread until a stop signal is received."""
-        self._shutdown_event.wait()
+    def wait_for_shutdown(self, timeout: Optional[float] = None) -> bool:
+        """Block the calling thread until a stop signal is received.
+
+        Args:
+            timeout: Optional number of seconds to wait before returning.
+                     If *None* (the default), block indefinitely.
+
+        Returns:
+            ``True`` if the shutdown event was set, ``False`` if the wait
+            timed out before a stop signal arrived.
+        """
+        return self._shutdown_event.wait(timeout=timeout)
 
     # ------------------------------------------------------------------
     # Internal
