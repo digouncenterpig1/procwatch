@@ -51,6 +51,10 @@ def main(argv=None):
         logger.error("Failed to load config: %s", exc)
         sys.exit(1)
 
+    if not config.processes:
+        logger.warning("No processes defined in %s, nothing to watch.", args.config)
+        sys.exit(0)
+
     logger.info("Loaded %d process(es) from %s", len(config.processes), args.config)
     supervisor = Supervisor(config)
     supervisor.run_forever()
