@@ -20,6 +20,10 @@ class RateLimiter:
     _last: float = field(init=False)
 
     def __post_init__(self) -> None:
+        if self.rate <= 0:
+            raise ValueError(f"rate must be positive, got {self.rate}")
+        if self.burst <= 0:
+            raise ValueError(f"burst must be positive, got {self.burst}")
         self._tokens = self.burst
         self._last = time.monotonic()
 
