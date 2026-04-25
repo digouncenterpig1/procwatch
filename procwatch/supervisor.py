@@ -57,6 +57,10 @@ class Supervisor:
                 logger.info("Restarting %s in %.1fs (attempt %d)", name, delay, restarts + 1)
                 time.sleep(delay)
                 new_proc = self._make_process(cfg)
-                new_proc.start()
+                try:
+                    new_proc.start()
+                except Exception:
+                    logger.exception("Failed to start process %s, will retry later.", name)
+                    continue
                 self._processes[name] = new_proc
                 self._restart_counts[name] = restarts + 1
