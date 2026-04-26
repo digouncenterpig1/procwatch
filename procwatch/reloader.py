@@ -57,6 +57,17 @@ class Reloader:
                 supervisor._processes[pcfg.name] = managed
                 managed.start()
 
+        # Restart processes whose config has changed
+        new_cfg_by_name = {p.name: p for p in new_cfg.processes}
+        old_cfg_by_name = {p.name: p for p in supervisor.config.processes}
+        for name in old_names & new_names:
+            if new_cfg_by_name[name] != old_cfg_by_name[name]:
+                log.info("reloader: restarting changed process '%s'", name)
+                supervisor._processes[name].stop()
+                managed = supervisor._make_process(new_cfg_by_name[name])
+                supervisor._processes[name] = managed
+                managed.start()
+
         # Update supervisor-level config
         supervisor.config = new_cfg
         log.info("reloader: reconciliation complete (kept=%d, added=%d, removed=%d)",
