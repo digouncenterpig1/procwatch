@@ -97,3 +97,13 @@ def test_apply_calls_both_helpers():
         apply(999, cfg)
         mn.assert_called_once_with(999, 3)
         mi.assert_called_once_with(999, 3, 0)
+
+
+def test_apply_skips_ionice_when_not_configured():
+    """apply() should not call apply_ionice when ionice_class is not set."""
+    cfg = PriorityConfig(nice=-2)
+    with patch("procwatch.priority.apply_nice") as mn, \
+         patch("procwatch.priority.apply_ionice") as mi:
+        apply(123, cfg)
+        mn.assert_called_once_with(123, -2)
+        mi.assert_not_called()
